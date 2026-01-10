@@ -1,4 +1,4 @@
-# WebPythonidae
+# InscriPython
 A single file browser IDE for Python based on Pyodide.
 Try it out at python.mkyu.one!
 
