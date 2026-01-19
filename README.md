@@ -1,5 +1,27 @@
-# InscriPython
-A single file browser IDE for Python based on Pyodide.
-Try it out at python.mkyu.one!
+# Inscribe Editor
+---
+A single-file lightweight in-browser Python editor and executor using Pyodide.
+Try it out at [py.mkyu.one](https://py.mkyu.one/)!
 
-![Screenshot](https://repository-images.githubusercontent.com/941984246/db6ac9ad-aa50-4587-81ea-784ea230e323)
+## Features
+- In-browser Python execution (WebAssembly via Pyodide)
+- Simple code editor powered by CodeMirror
+- Run full scripts or selected code (`# %%` supported)
+- Clear output console with basic error highlighting
+- Open and save files using browser file APIs
+- Persistent settings and draft recovery
+
+## v2 Changes
+- Cleaner, more focused UI
+- Improved editor and console readability
+- Status bar with execution state and cursor info
+- Better handling of partial code execution
+- Persistent editor preferences via `localStorage`
+
+## Why Inscribe?
+Designed to be minimal, fast, and distraction-free, ideal for learning or quick Python experiments directly in your browser.
+
+[Learn more about V2](https://log.mkyu.one/posts/inscribe/newinscribe/)
+[Learn more about Inscribe Editor](https://log.mkyu.one/posts/inscribe/inscripython/)
+
+![Screenshot](https://log.mkyu.one/posts/inscribe/inscribe2.png)
