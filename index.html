@@ -53,7 +53,6 @@
     --tFast:120ms;
     --tMed:180ms;
 
-    /* compact sizing */
     --uiFont:15px;
     --btnH:36px;
     --iconBtn:34px;
@@ -97,7 +96,6 @@
     to{ opacity:1; transform:translateY(0); }
   }
 
-  /* Header */
   header{
     position:sticky;
     top:0;
@@ -141,7 +139,6 @@
     color:var(--muted);
   }
 
-  /* Toolbar */
   .toolbar{
     display:flex;
     align-items:center;
@@ -163,7 +160,6 @@
     user-select:none;
     box-shadow:none;
     transition:
-      transform var(--tFast) var(--ease),
       background var(--tFast) var(--ease),
       box-shadow var(--tFast) var(--ease),
       border-color var(--tFast) var(--ease),
@@ -171,10 +167,9 @@
     padding:0 10px;
     white-space:nowrap;
   }
-  .toolBtn:active{ transform:translateY(0); }
+
   .toolBtn:hover{
     background:var(--accentSoft);
-    transform:translateY(-1px);
     box-shadow:var(--shadowHover);
   }
 
@@ -183,7 +178,6 @@
     line-height:1;
   }
 
-  /* Collapse/expand behavior */
   .toolBtn.collapse{
     max-width:40px;
     padding:0 10px;
@@ -231,12 +225,12 @@
     transform:translateX(-2px);
     transition:opacity var(--tFast) var(--ease), transform var(--tFast) var(--ease);
   }
-  .hintPill.noAuto{ margin-left:0; }
 
   .toolBtn.collapse:focus-visible .hintPill{
     opacity:1;
     transform:translateX(0);
   }
+
   @media (hover:hover) and (pointer:fine){
     .toolBtn.collapse:hover .hintPill{
       opacity:1;
@@ -244,7 +238,6 @@
     }
   }
 
-  /* Primary Run button */
   .toolBtn.primary{
     background:var(--accent);
     border-color:rgba(37,99,235,0.28);
@@ -252,27 +245,13 @@
     box-shadow:var(--shadow);
   }
   .toolBtn.primary:hover{
-    transform:translateY(-1px);
     box-shadow:var(--shadowHover);
     background:#1f55cf;
-  }
-  .toolBtn.primary .hintPill{
-    border-color:rgba(255,255,255,0.20);
-    background:rgba(255,255,255,0.16);
-    color:rgba(255,255,255,0.92);
-    opacity:1;
-    transform:none;
-  }
-  .toolBtn.primary .hintPill.modePill{
-    background:rgba(255,255,255,0.22);
-    border-color:rgba(255,255,255,0.18);
-    color:rgba(255,255,255,0.96);
   }
 
   .toolBtn:disabled{
     opacity:0.55;
     cursor:not-allowed;
-    transform:none!important;
     box-shadow:none!important;
   }
 
@@ -296,8 +275,37 @@
     border-left:1px solid rgba(255,255,255,0.18);
   }
 
-  /* Overflow menus */
+  /* Run selector chips */
+  .runMeta{
+    margin-left:auto;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .modeChip{
+    font-family:"IBM Plex Mono";
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.22);
+    background:rgba(255,255,255,0.20);
+    color:rgba(255,255,255,0.96);
+  }
+
+  .keyChip{
+    font-family:"IBM Plex Mono";
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.28);
+    background:transparent;
+    color:rgba(255,255,255,0.92);
+  }
+
+  /* Menus */
   .menuWrap{ position:relative; }
+
   .menu{
     position:absolute;
     top:calc(100% + 8px);
@@ -314,7 +322,10 @@
     z-index:40;
   }
   .menu.active{ display:block; animation:menuIn var(--tMed) var(--ease) both; }
-  @keyframes menuIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes menuIn{
+    from{opacity:0; transform:translateY(6px);}
+    to{opacity:1; transform:translateY(0);}
+  }
 
   .menuItem{
     width:100%;
@@ -328,11 +339,10 @@
     cursor:pointer;
     color:rgba(15,23,42,0.88);
     font-size:14px;
-    transition:background var(--tFast) var(--ease), transform var(--tFast) var(--ease);
+    transition:background var(--tFast) var(--ease);
   }
   .menuItem:hover{
     background:rgba(37,99,235,0.10);
-    transform:translateY(-1px);
   }
   .menuItem .material-icons{ font-size:18px; color:rgba(15,23,42,0.72); }
   .menuItem .miLabel{ flex:1; text-align:left; }
@@ -345,6 +355,35 @@
     background:rgba(15,23,42,0.04);
     color:rgba(15,23,42,0.70);
   }
+
+  /* Run menu alignment fix */
+  #runMenu{
+    min-width:270px;
+  }
+
+  #runMenu .menuItem{
+    display:grid;
+    grid-template-columns:22px 1fr auto;
+    align-items:center;
+    column-gap:12px;
+  }
+
+  #runMenu .menuItem .material-icons{
+    width:22px;
+    justify-self:center;
+  }
+
+  #runMenu .miLabel{
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  #runMenu .miHint{
+    justify-self:end;
+  }
+
   .menuItem .runDefaultHint{ visibility:hidden; }
   .menuItem.activeMode{
     background:rgba(37,99,235,0.12);
@@ -352,30 +391,6 @@
   }
   .menuItem.activeMode .runDefaultHint{ visibility:visible; }
 
-  /* Run menu alignment */
-#runMenu{
-  min-width:270px; /* gives label enough space */
-}
-
-#runMenu .menuItem .material-icons{
-  width:22px;              /* consistent icon column */
-  flex:0 0 22px;
-  text-align:center;
-}
-
-#runMenu .miLabel{
-  min-width:0;             /* required for ellipsis in flex layouts */
-  white-space:nowrap;      /* stops "Run selection" wrapping */
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-#runMenu .miHint{
-  flex:0 0 auto;           /* keep Default pill stable */
-}
-
-
-  /* Main */
   main{
     flex:1;
     min-height:0;
@@ -463,10 +478,9 @@
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    transition:background var(--tFast) var(--ease), transform var(--tFast) var(--ease);
+    transition:background var(--tFast) var(--ease);
   }
-  .iconBtn:hover{ background:rgba(37,99,235,0.10); transform:translateY(-1px); }
-  .iconBtn:active{ transform:translateY(0); }
+  .iconBtn:hover{ background:rgba(37,99,235,0.10); }
 
   .iconBtn.danger{
     border-color:rgba(180,35,24,0.18);
@@ -505,7 +519,6 @@
   }
   .resizer:hover::before{ background:rgba(15,23,42,0.26); }
 
-  /* CodeMirror */
   .CodeMirror,
   .CodeMirror pre,
   .CodeMirror-code{
@@ -523,7 +536,6 @@
   }
   .CodeMirror-linenumber{ color:rgba(15,23,42,0.42); }
 
-  /* Console */
   #console{
     flex:1;
     padding:10px;
@@ -547,7 +559,6 @@
   .err{ color:var(--danger); }
   .dim{ color:rgba(15,23,42,0.62); }
 
-  /* Status bar */
   footer.statusbar{
     flex:none;
     border-top:1px solid var(--border);
@@ -594,7 +605,6 @@
     max-width:40vw;
   }
 
-  /* Modals */
   .overlay{
     position:fixed;
     inset:0;
@@ -646,7 +656,6 @@
     margin-top:10px;
   }
 
-  /* Settings stack */
   .prefs{
     display:grid;
     grid-template-columns:1fr;
@@ -710,7 +719,6 @@
     accent-color:var(--accent);
   }
 
-  /* Shortcuts table */
   .shortcuts{
     width:100%;
     border-collapse:collapse;
@@ -764,13 +772,16 @@
         </div>
 
         <div class="toolbar">
-          <!-- Run split button and config menu -->
+          <!-- Run split button + config menu -->
           <div class="runGroup menuWrap" id="runGroup">
             <button class="toolBtn primary" id="runBtn" type="button" title="Run (Cmd/Ctrl + Enter)">
               <span class="material-icons" aria-hidden="true">play_arrow</span>
               <span class="toolLabel" style="opacity:1; transform:none;">Run</span>
-              <span class="hintPill modePill" id="runModePill">All</span>
-              <span class="hintPill noAuto" id="hintRun">⌘ Enter</span>
+
+              <span class="runMeta">
+                <span class="modeChip" id="runModePill">All</span>
+                <span class="keyChip" id="hintRun">Ctrl Enter</span>
+              </span>
             </button>
 
             <button class="toolBtn primary" id="runModeBtn" type="button" title="Run options"
@@ -786,7 +797,7 @@
               </button>
 
               <button class="menuItem" id="runSelBtn" type="button" role="menuitem">
-                <span class="material-icons" aria-hidden="true">text_select_start</span>
+                <span class="material-icons" aria-hidden="true">select_all</span>
                 <span class="miLabel">Run selection</span>
                 <span class="miHint runDefaultHint">Default</span>
               </button>
@@ -799,7 +810,6 @@
             </div>
           </div>
 
-          <!-- Compact: expands on hover/focus -->
           <button class="toolBtn collapse" id="openBtn" type="button" title="Open (Cmd/Ctrl + O)" aria-label="Open file">
             <span class="material-icons" aria-hidden="true">folder_open</span>
             <span class="toolLabel">Open</span>
@@ -812,7 +822,6 @@
             <span class="hintPill" id="hintSave">⌘ S</span>
           </button>
 
-          <!-- Overflow -->
           <div class="menuWrap">
             <button class="toolBtn collapse" id="moreBtn" type="button" aria-haspopup="menu" aria-expanded="false" title="More">
               <span class="material-icons" aria-hidden="true">more_horiz</span>
@@ -1021,9 +1030,6 @@
     },
     set(key, value){
       try { localStorage.setItem(key, value); } catch {}
-    },
-    remove(key){
-      try { localStorage.removeItem(key); } catch {}
     }
   };
 
@@ -1035,6 +1041,7 @@
 
     const consoleFallback = document.getElementById("console");
     const runBtnFallback = document.getElementById("runBtn");
+
     function showFatal(msg){
       console.error(msg);
       if (runBtnFallback) runBtnFallback.disabled = true;
@@ -1067,7 +1074,6 @@
       RUNMODE: "inscribe_runmode_v5"
     };
 
-    /* DOM refs */
     const runBtn = document.getElementById("runBtn");
     const runModeBtn = document.getElementById("runModeBtn");
     const runMenu = document.getElementById("runMenu");
@@ -1128,10 +1134,9 @@
       isDirty: false,
       pyodideReady: false,
       pyodideInstance: null,
-      runMode: safeLS.get(LS.RUNMODE) || "all" // all | selection | cell
+      runMode: safeLS.get(LS.RUNMODE) || "all"
     };
 
-    /* Utilities */
     function debounce(fn, delay=200){
       let t=null;
       return (...args)=>{
@@ -1174,7 +1179,6 @@
       return `${m}m ${rem.toFixed(1)}s`;
     }
 
-    /* Status bar */
     function setClass(el, s){
       el.classList.remove("good","warn","bad");
       el.classList.add(s);
@@ -1191,7 +1195,6 @@
       setClass(sbPy, state.pyodideReady ? "good" : "bad");
     }
 
-    /* Preferences */
     const defaultPrefs = {
       editorFontSize: 14.00,
       consoleFontSize: 13.50,
@@ -1214,7 +1217,6 @@
 
     let prefs = loadPrefs();
 
-    /* CodeMirror init */
     const editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
       mode: "python",
       theme: "eclipse",
@@ -1225,13 +1227,11 @@
       lineWrapping: !!prefs.lineWrap
     });
 
-    /* Unstick toolbar expanded state after native dialogs */
     function refocusEditor(){
       [openBtn, saveBtn, moreBtn, runModeBtn].forEach(b => b && b.blur());
       requestAnimationFrame(() => editor.focus());
     }
 
-    /* Run mode toggles */
     function getRunModeLabel(mode){
       if (mode === "selection") return "Selection";
       if (mode === "cell") return "Cell";
@@ -1242,13 +1242,11 @@
       const label = getRunModeLabel(state.runMode);
       runModePill.textContent = label;
 
-      // Active item highlight
       [runAllBtn, runSelBtn, runCellBtn].forEach(b => b.classList.remove("activeMode"));
       const map = { all: runAllBtn, selection: runSelBtn, cell: runCellBtn };
       const active = map[state.runMode];
       if (active) active.classList.add("activeMode");
 
-      // Make Run title reflect the current config
       runBtn.title = `Run ${label} (Cmd/Ctrl + Enter)`;
     }
 
@@ -1260,6 +1258,29 @@
       addConsoleLine(`Run mode set to: ${getRunModeLabel(state.runMode)}`, { dim:true });
     }
 
+    function getCurrentCellCode(){
+      const cursor = editor.getCursor();
+      const total = editor.lineCount();
+
+      let startLine = 0;
+      for (let i = cursor.line; i >= 0; i--) {
+        if (editor.getLine(i).trim().startsWith("# %%")) {
+          startLine = i + 1;
+          break;
+        }
+      }
+
+      let endLine = total;
+      for (let i = cursor.line + 1; i < total; i++) {
+        if (editor.getLine(i).trim().startsWith("# %%")) {
+          endLine = i;
+          break;
+        }
+      }
+
+      return editor.getRange({ line:startLine, ch:0 }, { line:endLine, ch:0 });
+    }
+
     function getCodeForMode(mode){
       if (mode === "cell") return getCurrentCellCode();
 
@@ -1268,11 +1289,9 @@
         return editor.getSelection();
       }
 
-      // all
       return editor.getValue();
     }
 
-    /* Filename + dirty state + draft */
     let currentFilename = safeLS.get(LS.FILENAME) || "untitled.py";
     fileMeta.textContent = currentFilename;
     sbFile.textContent = currentFilename;
@@ -1317,7 +1336,6 @@
       return msg;
     });
 
-    /* Clear console undo (3 seconds) */
     let consoleBackup = null;
     let undoTimer = null;
 
@@ -1344,7 +1362,6 @@
       undoClearBtn.style.display = "none";
     }
 
-    /* Pyodide execution */
     async function initializePyodide(){
       if (state.pyodideInstance) return;
 
@@ -1385,29 +1402,6 @@ builtins.input = custom_input
       refocusEditor();
     }
 
-    function getCurrentCellCode(){
-      const cursor = editor.getCursor();
-      const total = editor.lineCount();
-
-      let startLine = 0;
-      for (let i = cursor.line; i >= 0; i--) {
-        if (editor.getLine(i).trim().startsWith("# %%")) {
-          startLine = i + 1;
-          break;
-        }
-      }
-
-      let endLine = total;
-      for (let i = cursor.line + 1; i < total; i++) {
-        if (editor.getLine(i).trim().startsWith("# %%")) {
-          endLine = i;
-          break;
-        }
-      }
-
-      return editor.getRange({ line:startLine, ch:0 }, { line:endLine, ch:0 });
-    }
-
     async function runCode(mode="all"){
       if (state.isRunning) return;
       state.isRunning = true;
@@ -1415,9 +1409,6 @@ builtins.input = custom_input
 
       runBtn.disabled = true;
       runModeBtn.disabled = true;
-
-      let didExecute = false;
-      let ok = false;
 
       try{
         if (!state.pyodideInstance) await initializePyodide();
@@ -1429,11 +1420,9 @@ builtins.input = custom_input
         }
 
         addConsoleLine(`Executing (${getRunModeLabel(mode)})…`, { dim:true });
-        const t0 = performance.now();
 
+        const t0 = performance.now();
         await state.pyodideInstance.runPythonAsync(code);
-        didExecute = true;
-        ok = true;
 
         const output = state.pyodideInstance.runPython("sys.stdout.getvalue()");
         if (output && output.trim().length) {
@@ -1448,32 +1437,24 @@ builtins.input = custom_input
         addConsoleLine(`Finished in ${formatDuration(dt)}.`, { dim:true });
 
       } catch (err) {
-        didExecute = true;
-        ok = false;
-
         const msg = err?.toString?.() ?? String(err);
         msg.split("\n").forEach(l => {
           if (l.trim()) addConsoleLine(l, { error:true });
         });
-
         addConsoleLine("Finished with errors.", { dim:true });
       } finally {
         state.isRunning = false;
         updateStatusBar();
-
         runBtn.disabled = false;
         runModeBtn.disabled = false;
-
         refocusEditor();
       }
     }
 
     function runDefault(){
-      // Cmd/Ctrl+Enter uses the configured run mode
       return runCode(state.runMode);
     }
 
-    /* File open/save */
     function openFile(){
       openBtn.blur();
       fileInput.value = "";
@@ -1521,7 +1502,6 @@ builtins.input = custom_input
       refocusEditor();
     }
 
-    /* Wrap toggle */
     function toggleWrap(){
       prefs.lineWrap = !prefs.lineWrap;
       savePrefs(prefs);
@@ -1530,7 +1510,6 @@ builtins.input = custom_input
       refocusEditor();
     }
 
-    /* Modals */
     function openAbout(){ aboutOverlay.classList.add("active"); }
     function closeAbout(){ aboutOverlay.classList.remove("active"); }
     function openSettings(){ settingsOverlay.classList.add("active"); }
@@ -1544,7 +1523,6 @@ builtins.input = custom_input
     aboutOverlay.addEventListener("click", (e) => { if (e.target === aboutOverlay) closeAbout(); });
     settingsOverlay.addEventListener("click", (e) => { if (e.target === settingsOverlay) closeSettings(); });
 
-    /* Cursor status and clock */
     function updateCursorStatus(){
       const c = editor.getCursor();
       sbPos.textContent = `Ln ${c.line + 1}, Col ${c.ch + 1}`;
@@ -1563,7 +1541,6 @@ builtins.input = custom_input
     }
     setInterval(updateClock, 1000);
 
-    /* Shortcuts view + OS modifier hints */
     function isMac(){
       const p = navigator.platform || "";
       const ua = navigator.userAgent || "";
@@ -1597,6 +1574,44 @@ builtins.input = custom_input
     function isModKey(e){
       return e.metaKey || e.ctrlKey;
     }
+
+    function openMenu(){
+      closeRunMenu();
+      moreMenu.classList.add("active");
+      moreBtn.setAttribute("aria-expanded", "true");
+    }
+    function closeMenu(){
+      moreMenu.classList.remove("active");
+      moreBtn.setAttribute("aria-expanded", "false");
+      moreBtn.blur();
+    }
+    function toggleMenu(){
+      if (moreMenu.classList.contains("active")) closeMenu();
+      else openMenu();
+    }
+
+    function openRunMenu(){
+      closeMenu();
+      runMenu.classList.add("active");
+      runModeBtn.setAttribute("aria-expanded", "true");
+    }
+    function closeRunMenu(){
+      runMenu.classList.remove("active");
+      runModeBtn.setAttribute("aria-expanded", "false");
+      runModeBtn.blur();
+    }
+    function toggleRunMenu(){
+      if (runMenu.classList.contains("active")) closeRunMenu();
+      else openRunMenu();
+    }
+
+    document.addEventListener("click", (e) => {
+      const withinMore = moreMenu.contains(e.target) || moreBtn.contains(e.target);
+      if (!withinMore) closeMenu();
+
+      const withinRun = runMenu.contains(e.target) || runModeBtn.contains(e.target);
+      if (!withinRun) closeRunMenu();
+    });
 
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -1636,47 +1651,6 @@ builtins.input = custom_input
       }
     }, { passive:false });
 
-    /* More menu */
-    function openMenu(){
-      closeRunMenu();
-      moreMenu.classList.add("active");
-      moreBtn.setAttribute("aria-expanded", "true");
-    }
-    function closeMenu(){
-      moreMenu.classList.remove("active");
-      moreBtn.setAttribute("aria-expanded", "false");
-      moreBtn.blur();
-    }
-    function toggleMenu(){
-      if (moreMenu.classList.contains("active")) closeMenu();
-      else openMenu();
-    }
-
-    /* Run menu */
-    function openRunMenu(){
-      closeMenu();
-      runMenu.classList.add("active");
-      runModeBtn.setAttribute("aria-expanded", "true");
-    }
-    function closeRunMenu(){
-      runMenu.classList.remove("active");
-      runModeBtn.setAttribute("aria-expanded", "false");
-      runModeBtn.blur();
-    }
-    function toggleRunMenu(){
-      if (runMenu.classList.contains("active")) closeRunMenu();
-      else openRunMenu();
-    }
-
-    document.addEventListener("click", (e) => {
-      const withinMore = moreMenu.contains(e.target) || moreBtn.contains(e.target);
-      if (!withinMore) closeMenu();
-
-      const withinRun = runMenu.contains(e.target) || runModeBtn.contains(e.target);
-      if (!withinRun) closeRunMenu();
-    });
-
-    /* Preferences apply */
     function applyPrefs(){
       dynamicStyles.textContent = `
         .CodeMirror{ font-size:${prefs.editorFontSize}px; }
@@ -1693,7 +1667,6 @@ builtins.input = custom_input
       wrapToggle.checked = !!prefs.lineWrap;
     }
 
-    /* Resizer */
     let dragging = false;
     let startY = 0;
     let startHeight = 0;
@@ -1724,7 +1697,6 @@ builtins.input = custom_input
 
     document.addEventListener("mouseup", ()=>{ dragging = false; });
 
-    /* Wire buttons */
     runBtn.addEventListener("click", runDefault);
     runModeBtn.addEventListener("click", toggleRunMenu);
 
@@ -1765,7 +1737,6 @@ builtins.input = custom_input
       applyPrefs();
     });
 
-    /* Init */
     clearConsole(true);
     setHints();
     applyPrefs();
