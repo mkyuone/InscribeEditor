@@ -384,12 +384,33 @@
     justify-self:end;
   }
 
-  .menuItem .runDefaultHint{ visibility:hidden; }
+/* Right-side badges in run menu */
+#runMenu .miRight{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  justify-self:end;
+}
+
+/* Default badge stays only on Run all */
+#runMenu .defaultBadge{ display:none; }
+#runAllBtn .defaultBadge{ display:inline-flex; }
+
+/* Checkmark shows active mode */
+#runMenu .miCheck{
+  display:none;
+  font-size:18px;
+  color:rgba(37,99,235,0.95);
+}
+#runMenu .menuItem.activeMode .miCheck{
+  display:inline-block;
+}
+
+
   .menuItem.activeMode{
     background:rgba(37,99,235,0.12);
     border-color:rgba(37,99,235,0.20);
   }
-  .menuItem.activeMode .runDefaultHint{ visibility:visible; }
 
   main{
     flex:1;
@@ -789,25 +810,35 @@
               <span class="material-icons" aria-hidden="true">arrow_drop_down</span>
             </button>
 
-            <div class="menu" id="runMenu" role="menu" aria-label="Run options">
-              <button class="menuItem" id="runAllBtn" type="button" role="menuitem">
-                <span class="material-icons" aria-hidden="true">description</span>
-                <span class="miLabel">Run all</span>
-                <span class="miHint runDefaultHint">Default</span>
-              </button>
+<div class="menu" id="runMenu" role="menu" aria-label="Run options">
+  <button class="menuItem" id="runAllBtn" type="button" role="menuitem">
+    <span class="material-icons" aria-hidden="true">description</span>
+    <span class="miLabel">Run all</span>
+    <span class="miRight" aria-hidden="true">
+      <span class="miHint defaultBadge">Default</span>
+      <span class="material-icons miCheck">done</span>
+    </span>
+  </button>
 
-              <button class="menuItem" id="runSelBtn" type="button" role="menuitem">
-                <span class="material-icons" aria-hidden="true">select_all</span>
-                <span class="miLabel">Run selection</span>
-                <span class="miHint runDefaultHint">Default</span>
-              </button>
+  <button class="menuItem" id="runSelBtn" type="button" role="menuitem">
+    <span class="material-icons" aria-hidden="true">select_all</span>
+    <span class="miLabel">Run selection</span>
+    <span class="miRight" aria-hidden="true">
+      <span class="miHint defaultBadge">Default</span>
+      <span class="material-icons miCheck">done</span>
+    </span>
+  </button>
 
-              <button class="menuItem" id="runCellBtn" type="button" role="menuitem">
-                <span class="material-icons" aria-hidden="true">view_agenda</span>
-                <span class="miLabel">Run cell</span>
-                <span class="miHint runDefaultHint">Default</span>
-              </button>
-            </div>
+  <button class="menuItem" id="runCellBtn" type="button" role="menuitem">
+    <span class="material-icons" aria-hidden="true">view_agenda</span>
+    <span class="miLabel">Run cell</span>
+    <span class="miRight" aria-hidden="true">
+      <span class="miHint defaultBadge">Default</span>
+      <span class="material-icons miCheck">done</span>
+    </span>
+  </button>
+</div>
+
           </div>
 
           <button class="toolBtn collapse" id="openBtn" type="button" title="Open (Cmd/Ctrl + O)" aria-label="Open file">
