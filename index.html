@@ -192,10 +192,18 @@
     padding:0 10px;
     overflow:hidden;
   }
-  .toolBtn.collapse:hover,
+
+  /* Expand on keyboard focus (non-sticky with our JS blur/refocus) */
   .toolBtn.collapse:focus-visible,
   .toolBtn.collapse:focus-within{
     max-width:180px;
+  }
+
+  /* Expand on hover ONLY for devices that truly support hover (prevents sticky hover on touch) */
+  @media (hover:hover) and (pointer:fine){
+    .toolBtn.collapse:hover{
+      max-width:180px;
+    }
   }
 
   .toolLabel{
@@ -203,11 +211,20 @@
     transform:translateX(-2px);
     transition:opacity var(--tFast) var(--ease), transform var(--tFast) var(--ease);
   }
-  .toolBtn.collapse:hover .toolLabel,
+
+  /* Show label on focus */
   .toolBtn.collapse:focus-visible .toolLabel,
   .toolBtn.collapse:focus-within .toolLabel{
     opacity:1;
     transform:translateX(0);
+  }
+
+  /* Show label on hover only on hover-capable devices */
+  @media (hover:hover) and (pointer:fine){
+    .toolBtn.collapse:hover .toolLabel{
+      opacity:1;
+      transform:translateX(0);
+    }
   }
 
   .hintPill{
@@ -223,10 +240,19 @@
     transform:translateX(-2px);
     transition:opacity var(--tFast) var(--ease), transform var(--tFast) var(--ease);
   }
-  .toolBtn.collapse:hover .hintPill,
+
+  /* Show hint on focus */
   .toolBtn.collapse:focus-visible .hintPill{
     opacity:1;
     transform:translateX(0);
+  }
+
+  /* Show hint on hover only on hover-capable devices */
+  @media (hover:hover) and (pointer:fine){
+    .toolBtn.collapse:hover .hintPill{
+      opacity:1;
+      transform:translateX(0);
+    }
   }
 
   /* Primary Run button (always expanded) */
@@ -1117,6 +1143,14 @@
       lineWrapping: !!prefs.lineWrap
     });
 
+    /* unsticks toolbar expanded state after native dialogs */
+    function refocusEditor(){
+      // blur toolbar buttons so :focus-visible doesn't keep them expanded
+      [openBtn, saveBtn, moreBtn].forEach(b => b && b.blur());
+      // Return caret to editor
+      requestAnimationFrame(() => editor.focus());
+    }
+
     /* Filename + dirty state + draft */
     let currentFilename = safeLS.get(LS.FILENAME) || "untitled.py";
     fileMeta.textContent = currentFilename;
@@ -1227,6 +1261,7 @@ builtins.input = custom_input
       state.pyodideReady = false;
       addConsoleLine("Environment reset. Next run will reload Pyodide.", { dim:true });
       updateStatusBar();
+      refocusEditor(); // feels better
     }
 
     function getSelectedOrAllCode(){
@@ -1294,11 +1329,14 @@ builtins.input = custom_input
         state.isRunning = false;
         updateStatusBar();
         runBtn.disabled = false;
+        refocusEditor(); // keeps UI clean after run
       }
     }
 
     /* File open/save */
     function openFile(){
+      // blur before native dialog (helps reduce stuck focus in some browsers)
+      openBtn.blur();
       fileInput.value = "";
       fileInput.click();
     }
@@ -1307,6 +1345,7 @@ builtins.input = custom_input
       const file = e.target.files && e.target.files[0];
       if (!file) {
         addConsoleLine("Open cancelled.", { dim:true });
+        refocusEditor(); // collapses any stuck expanded button
         return;
       }
       const reader = new FileReader();
@@ -1316,11 +1355,16 @@ builtins.input = custom_input
         lastSavedContent = editor.getValue();
         setDirty(false);
         addConsoleLine(`Loaded: ${file.name}`, { dim:true });
+
+        refocusEditor(); // important
       };
       reader.readAsText(file);
     });
 
     function saveFile(){
+      // blur before triggering download
+      saveBtn.blur();
+
       const code = editor.getValue();
       const blob = new Blob([code], { type:"text/plain" });
       const url = URL.createObjectURL(blob);
@@ -1336,6 +1380,8 @@ builtins.input = custom_input
       lastSavedContent = code;
       setDirty(false);
       addConsoleLine(`Saved: ${a.download}`, { dim:true });
+
+      refocusEditor();
     }
 
     /* Wrap toggle */
@@ -1344,6 +1390,7 @@ builtins.input = custom_input
       savePrefs(prefs);
       applyPrefs();
       addConsoleLine(`Line wrap: ${prefs.lineWrap ? "on" : "off"}`, { dim:true });
+      refocusEditor();
     }
 
     /* Modals */
@@ -1418,6 +1465,7 @@ builtins.input = custom_input
       if (e.key === "Escape") {
         closeAnyModal();
         closeMenu();
+        refocusEditor();
         return;
       }
 
@@ -1458,6 +1506,7 @@ builtins.input = custom_input
     function closeMenu(){
       moreMenu.classList.remove("active");
       moreBtn.setAttribute("aria-expanded", "false");
+      moreBtn.blur(); // prevents sticky expanded state on More button
     }
     function toggleMenu(){
       if (moreMenu.classList.contains("active")) closeMenu();
@@ -1533,8 +1582,8 @@ builtins.input = custom_input
     clearConsoleBtn.addEventListener("click", clearConsoleWithUndo);
     undoClearBtn.addEventListener("click", undoClearConsole);
 
-    closeAboutBtn.addEventListener("click", closeAbout);
-    closeSettingsBtn.addEventListener("click", closeSettings);
+    closeAboutBtn.addEventListener("click", () => { closeAbout(); refocusEditor(); });
+    closeSettingsBtn.addEventListener("click", () => { closeSettings(); refocusEditor(); });
 
     editorSizeRange.addEventListener("input", ()=>{
       prefs.editorFontSize = parseFloat(editorSizeRange.value);
@@ -1559,6 +1608,7 @@ builtins.input = custom_input
     updateStatusBar();
     updateCursorStatus();
     updateClock();
+    refocusEditor(); // start with editor focused
   }
 
   if (document.readyState === "loading") {
