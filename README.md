@@ -17,26 +17,24 @@ It’s designed to be minimal, fast, and distraction-free — ideal for learning
 - Persistent settings and draft recovery via `localStorage`
 
 
-## What’s New in v3
+## Changelog
 
+### v3.1
+- Shareable URLs with compressed code payloads
+
+### v3.0
 - Modular TypeScript source under `src/`
 - Compiled output emitted to `dist/`
 - All external JS, CSS, and fonts vendored locally under `assets/`
 - Local-first loading for Pyodide + CodeMirror (no CDN required)
+- Structural refactor with familiar UI/behavior and a cleaner codebase
 
-v3 is a structural refactor — behavior and UI remain familiar, but the codebase is cleaner, more maintainable, and ready for future features.
-
-
-<details>
-<summary><strong>Changes in v2</strong></summary>
-
+### v2.0
 - Cleaner, more focused UI
 - Improved editor and console readability
 - Status bar with execution state and cursor info
 - Better handling of partial code execution
 - Persistent editor preferences via <code>localStorage</code>
-
-</details>
 
 
 ## Why Inscribe?
