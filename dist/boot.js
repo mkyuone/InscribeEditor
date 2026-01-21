@@ -15,6 +15,7 @@ import { createInitialState } from "./app/state.js";
 import { setFilenameStatus, updateClock, updateCursorStatus, updateStatusBar } from "./app/status.js";
 import { getRunModeLabel, setRunMode, updateRunModeUI } from "./app/run-mode.js";
 import { createRefocusEditor, createUiController } from "./app/ui.js";
+import { APP_VERSION, BUILD_TIME, COMMIT_HASH } from "./version.js";
 function waitForGlobals(timeoutMs = 9000) {
     return new Promise((resolve, reject) => {
         const start = performance.now();
@@ -102,6 +103,9 @@ export async function boot() {
     pyodideCtrl = createPyodideController(state, consoleApi.addLine, () => updateStatusBar(state, dom), refocusEditor, editorCtrl.getCodeForMode, getRunModeLabel, dom.runBtn, dom.runModeBtn, prefs, consoleApi.resetStdoutBuffer, consoleApi.flushStdoutBuffer);
     const shareCtrl = createShareController(dom, () => editorCtrl.getValue(), consoleApi.addLine, () => fileCtrl.saveFile(), refocusEditor);
     fileCtrl.setFilename(safeLS.get(LS_KEYS.FILENAME) || "untitled.py");
+    dom.aboutVersion.textContent = `v${APP_VERSION}`;
+    dom.aboutBuildTime.textContent = BUILD_TIME;
+    dom.aboutCommitHash.textContent = COMMIT_HASH;
     const shared = await shareCtrl.readSharedCodeFromUrl();
     const draft = safeLS.get(LS_KEYS.DRAFT);
     if (shared && shared.code.trim().length) {

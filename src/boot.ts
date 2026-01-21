@@ -15,6 +15,7 @@ import { createInitialState } from "./app/state.js";
 import { setFilenameStatus, updateClock, updateCursorStatus, updateStatusBar } from "./app/status.js";
 import { getRunModeLabel, setRunMode, updateRunModeUI } from "./app/run-mode.js";
 import { createRefocusEditor, createUiController, UiController } from "./app/ui.js";
+import { APP_VERSION, BUILD_TIME, COMMIT_HASH } from "./version.js";
 
 function waitForGlobals(timeoutMs = 9000) {
   return new Promise<void>((resolve, reject) => {
@@ -168,6 +169,9 @@ export async function boot() {
   );
 
   fileCtrl.setFilename(safeLS.get(LS_KEYS.FILENAME) || "untitled.py");
+  dom.aboutVersion.textContent = `v${APP_VERSION}`;
+  dom.aboutBuildTime.textContent = BUILD_TIME;
+  dom.aboutCommitHash.textContent = COMMIT_HASH;
 
   const shared = await shareCtrl.readSharedCodeFromUrl();
   const draft = safeLS.get(LS_KEYS.DRAFT);

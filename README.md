@@ -76,7 +76,7 @@ Perfect for learning, demos, or environments where installing Python isn’t ide
 Compile the TypeScript source into <code>dist/</code>:
 
 ```sh
-npm exec --yes --package typescript@5.4.5 tsc -- --project tsconfig.json
+./scripts/build.sh
 ```
 
 ### Serve locally

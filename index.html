@@ -223,10 +223,20 @@
   <!-- About modal -->
   <div class="overlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
     <div class="modal modalAbout">
-      <h2 id="aboutTitle">Inscribe Editor <span class="versionTag">v3.1</span></h2>
+      <h2 id="aboutTitle">Inscribe Editor <span class="versionTag" id="aboutVersion">v3.1</span></h2>
       <p>A lightweight in-browser Python editor and executor using Pyodide.</p>
+      <div class="aboutMeta">
+        <div class="aboutMetaRow">
+          <span class="aboutMetaLabel">Build time</span>
+          <span class="aboutMetaValue" id="aboutBuildTime">unknown</span>
+        </div>
+        <div class="aboutMetaRow">
+          <span class="aboutMetaLabel">Commit</span>
+          <span class="aboutMetaValue aboutMetaCode" id="aboutCommitHash">unknown</span>
+        </div>
+      </div>
       <p>
-        This software comes with absolutely no warranty.<br/>
+        This software is provided “as is”, without warranty of any kind.<br/>
         Licensed under the MIT License.
       </p>
       <p style="color: rgba(15,23,42,0.70);">
