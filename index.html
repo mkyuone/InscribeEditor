@@ -104,6 +104,12 @@
             <span class="hintPill" id="hintSave">⌘ S</span>
           </button>
 
+          <button class="toolBtn collapse" id="shareBtn" type="button" title="Share link" aria-label="Share link">
+            <span class="material-icons" aria-hidden="true">share</span>
+            <span class="toolLabel">Share</span>
+            <span class="hintPill">Link</span>
+          </button>
+
           <div class="menuWrap">
             <button class="toolBtn collapse" id="moreBtn" type="button" aria-haspopup="menu" aria-expanded="false" title="More">
               <span class="material-icons" aria-hidden="true">more_horiz</span>
@@ -111,6 +117,12 @@
             </button>
 
             <div class="menu" id="moreMenu" role="menu" aria-label="More actions">
+              <button class="menuItem" id="shareMenuBtn" type="button" role="menuitem">
+                <span class="material-icons" aria-hidden="true">share</span>
+                <span class="miLabel">Share link</span>
+                <span class="miHint">URL</span>
+              </button>
+
               <button class="menuItem" id="resetBtn" type="button" role="menuitem">
                 <span class="material-icons" aria-hidden="true">restart_alt</span>
                 <span class="miLabel">Reset</span>
@@ -193,10 +205,18 @@
     </footer>
   </div>
 
+  <div class="toast" id="shareToast" role="status" aria-live="polite">
+    <span class="material-icons" id="shareToastIcon" aria-hidden="true">check_circle</span>
+    <div class="toastText">
+      <div class="toastTitle" id="shareToastTitle">Shared code loaded</div>
+      <div class="toastDesc" id="shareToastDesc">This editor opened code from a share link.</div>
+    </div>
+  </div>
+
   <!-- About modal -->
   <div class="overlay" id="aboutOverlay" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
     <div class="modal modalAbout">
-      <h2 id="aboutTitle">Inscribe Editor <span class="versionTag">v3.0</span></h2>
+      <h2 id="aboutTitle">Inscribe Editor <span class="versionTag">v3.1</span></h2>
       <p>A lightweight in-browser Python editor and executor using Pyodide.</p>
       <p>
         This software comes with absolutely no warranty.<br/>

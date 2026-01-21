@@ -64,9 +64,11 @@ export async function boot() {
     const runLabel = byId("runLabel");
     const openBtn = byId("openBtn");
     const saveBtn = byId("saveBtn");
+    const shareBtn = byId("shareBtn");
     const fileInput = byId("fileInput");
     const moreBtn = byId("moreBtn");
     const moreMenu = byId("moreMenu");
+    const shareMenuBtn = byId("shareMenuBtn");
     const resetBtn = byId("resetBtn");
     const settingsBtn = byId("settingsBtn");
     const aboutBtn = byId("aboutBtn");
@@ -80,6 +82,10 @@ export async function boot() {
     const closeAboutBtn = byId("closeAboutBtn");
     const settingsOverlay = byId("settingsOverlay");
     const closeSettingsBtn = byId("closeSettingsBtn");
+    const shareToast = byId("shareToast");
+    const shareToastTitle = byId("shareToastTitle");
+    const shareToastDesc = byId("shareToastDesc");
+    const shareToastIcon = byId("shareToastIcon");
     const fileMeta = byId("fileMeta");
     const sbRun = byId("sbRun");
     const sbDirty = byId("sbDirty");
@@ -145,7 +151,7 @@ export async function boot() {
         lineWrapping: !!prefs.lineWrap
     });
     function refocusEditor() {
-        [openBtn, saveBtn, moreBtn, runModeBtn].forEach((b) => b && b.blur());
+        [openBtn, saveBtn, shareBtn, moreBtn, runModeBtn].forEach((b) => b && b.blur());
         requestAnimationFrame(() => editor.focus());
     }
     function getRunModeLabel(mode) {
@@ -225,13 +231,6 @@ export async function boot() {
     const saveDraftDebounced = debounce(() => {
         safeLS.set(LS_KEYS.DRAFT, editor.getValue());
     }, 200);
-    const draft = safeLS.get(LS_KEYS.DRAFT);
-    if (draft && draft.trim().length) {
-        editor.setValue(draft);
-        lastSavedContent = editor.getValue();
-        setDirty(false);
-        addConsoleLine("Restored previous draft.", { dim: true, system: true });
-    }
     editor.on("change", () => {
         const curr = editor.getValue();
         setDirty(curr !== lastSavedContent);
@@ -260,6 +259,123 @@ export async function boot() {
         line.innerHTML = `<span class="prefix">${prefix}</span>${escapeHtml(text)}`;
         consoleEl.appendChild(line);
         consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+    const SHARE_PREFIX = "v1:";
+    let toastTimer = null;
+    function showToast(title, desc, icon = "check_circle") {
+        shareToastTitle.textContent = title;
+        shareToastDesc.textContent = desc;
+        shareToastIcon.textContent = icon;
+        shareToast.classList.add("show");
+        if (toastTimer)
+            clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            shareToast.classList.remove("show");
+        }, 2800);
+    }
+    shareToast.addEventListener("click", () => {
+        shareToast.classList.remove("show");
+    });
+    function bytesToBase64Url(bytes) {
+        let binary = "";
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            const chunk = bytes.subarray(i, i + chunkSize);
+            binary += String.fromCharCode(...chunk);
+        }
+        return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+    function base64UrlToBytes(data) {
+        let base64 = data.replace(/-/g, "+").replace(/_/g, "/");
+        const pad = base64.length % 4;
+        if (pad)
+            base64 += "=".repeat(4 - pad);
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i += 1) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes;
+    }
+    async function compressText(text) {
+        const CompressionStreamCtor = window.CompressionStream;
+        if (!CompressionStreamCtor)
+            throw new Error("CompressionStream not supported");
+        const data = new TextEncoder().encode(text);
+        const stream = new Blob([data]).stream().pipeThrough(new CompressionStreamCtor("gzip"));
+        const buffer = await new Response(stream).arrayBuffer();
+        return new Uint8Array(buffer);
+    }
+    async function decompressText(bytes) {
+        const DecompressionStreamCtor = window.DecompressionStream;
+        if (!DecompressionStreamCtor)
+            throw new Error("DecompressionStream not supported");
+        const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStreamCtor("gzip"));
+        const buffer = await new Response(stream).arrayBuffer();
+        return new TextDecoder().decode(buffer);
+    }
+    function encodePlain(text) {
+        return bytesToBase64Url(new TextEncoder().encode(text));
+    }
+    function decodePlain(encoded) {
+        return new TextDecoder().decode(base64UrlToBytes(encoded));
+    }
+    async function buildShareUrl(code) {
+        const url = new URL(window.location.href);
+        const payload = `${SHARE_PREFIX}${code}`;
+        try {
+            const compressed = await compressText(payload);
+            url.hash = `c=${bytesToBase64Url(compressed)}`;
+            return { url: url.toString(), usedCompression: true };
+        }
+        catch {
+            url.hash = `code=${encodePlain(payload)}`;
+            return { url: url.toString(), usedCompression: false };
+        }
+    }
+    async function readSharedCodeFromUrl() {
+        const hash = window.location.hash.startsWith("#")
+            ? window.location.hash.slice(1)
+            : window.location.hash;
+        if (!hash)
+            return null;
+        const params = new URLSearchParams(hash);
+        const compressed = params.get("c");
+        const plain = params.get("code");
+        if (!compressed && !plain)
+            return null;
+        try {
+            const decoded = compressed
+                ? await decompressText(base64UrlToBytes(compressed))
+                : decodePlain(plain !== null && plain !== void 0 ? plain : "");
+            const code = decoded.startsWith(SHARE_PREFIX)
+                ? decoded.slice(SHARE_PREFIX.length)
+                : decoded;
+            return { code, compressed: !!compressed };
+        }
+        catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            addConsoleLine(`Share link failed to decode: ${msg}`, { error: true });
+            showToast("Share link invalid", "This link could not be decoded.", "error_outline");
+            return null;
+        }
+    }
+    const shared = await readSharedCodeFromUrl();
+    const draft = safeLS.get(LS_KEYS.DRAFT);
+    if (shared && shared.code.trim().length) {
+        editor.setValue(shared.code);
+        setFilename("shared.py");
+        lastSavedContent = editor.getValue();
+        safeLS.set(LS_KEYS.DRAFT, editor.getValue());
+        setDirty(false);
+        addConsoleLine("Loaded shared code from link.", { dim: true, system: true });
+        showToast("Shared code loaded", "This editor opened code from a share link.");
+    }
+    else if (draft && draft.trim().length) {
+        editor.setValue(draft);
+        lastSavedContent = editor.getValue();
+        setDirty(false);
+        addConsoleLine("Restored previous draft.", { dim: true, system: true });
     }
     const inputQueue = [];
     let activeInput = null;
@@ -616,6 +732,49 @@ builtins.input = custom_input
         addConsoleLine(`Saved: ${a.download}`, { dim: true, system: true });
         refocusEditor();
     }
+    async function copyToClipboard(text) {
+        var _a;
+        if ((_a = navigator.clipboard) === null || _a === void 0 ? void 0 : _a.writeText) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "true");
+        textarea.style.position = "fixed";
+        textarea.style.top = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand("copy");
+        }
+        finally {
+            document.body.removeChild(textarea);
+        }
+    }
+    async function shareCode() {
+        shareBtn.blur();
+        const code = editor.getValue();
+        if (!code.trim()) {
+            showToast("Nothing to share", "Write some code first, then share a link.", "error_outline");
+            return;
+        }
+        try {
+            const { url, usedCompression } = await buildShareUrl(code);
+            await copyToClipboard(url);
+            const note = usedCompression ? "Compressed and copied to clipboard." : "Copied to clipboard.";
+            addConsoleLine(`Share link created. ${note}`, { dim: true, system: true });
+            showToast("Share link copied", "Anyone with this link can open the code.");
+        }
+        catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            addConsoleLine(`Share failed: ${msg}`, { error: true });
+            showToast("Share failed", "Your browser blocked link sharing.", "error_outline");
+        }
+        finally {
+            refocusEditor();
+        }
+    }
     function toggleWrap() {
         prefs.lineWrap = !prefs.lineWrap;
         savePrefs(prefs);
@@ -832,7 +991,14 @@ builtins.input = custom_input
     });
     openBtn.addEventListener("click", openFile);
     saveBtn.addEventListener("click", saveFile);
+    shareBtn.addEventListener("click", () => {
+        void shareCode();
+    });
     moreBtn.addEventListener("click", toggleMenu);
+    shareMenuBtn.addEventListener("click", () => {
+        closeMenu();
+        void shareCode();
+    });
     resetBtn.addEventListener("click", () => {
         closeMenu();
         resetEnvironment();
